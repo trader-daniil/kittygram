@@ -6,6 +6,16 @@ from cats.serializers import CatSerializer
 from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework import generics
+from rest_framework import viewsets
+from rest_framework.routers import SimpleRouter
+
+
+class CatViewSet(viewsets.ModelViewSet):
+    """
+    Все операции с моделью Cat.
+    """
+    queryset = Cat.objects.all()
+    serializer_class = CatSerializer
 
 
 class ListCats2(generics.ListCreateAPIView):

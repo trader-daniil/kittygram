@@ -1,5 +1,7 @@
+from xml.etree.ElementInclude import include
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import SimpleRouter
 
 from .views import (
     get_or_create_cats,
@@ -9,6 +11,13 @@ from .views import (
     CatDetail,
     ListCats2,
     CatDetail2,
+    CatViewSet,
+)
+
+router = SimpleRouter()
+router.register(
+    prefix='cats4',
+    viewset=CatViewSet,
 )
 
 urlpatterns = [
@@ -20,4 +29,5 @@ urlpatterns = [
     path('cats2/<int:cat_id>', CatDetail.as_view()),
     path('cats3/', ListCats2.as_view()),
     path('cats3/<int:cat_id>', CatDetail2.as_view()),
+    path('', include(router.urls)),
 ]
