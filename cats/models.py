@@ -2,6 +2,15 @@ from django.db import models
 from datetime import date
 
 
+class Achievement(models.Model):
+    """
+    Модель действий кота.
+    """
+    name = models.CharField(
+        max_length=128,
+        verbose_name='Название действия',
+    )
+
 
 class Person(models.Model):
     """
@@ -33,25 +42,22 @@ class Person(models.Model):
         return f'{self.first_name} {self.last_name}'
 
 
+COLOR_CHOICES = (
+    ('BLACK', 'Black'),
+    ('WHITE', 'White'),
+    ('ORANGE', 'Orange'),
+)
 
 class Cat(models.Model):
     """Модель кота."""
-    BL = 'BLACK'
-    WT = 'WHITE'
-    OR = 'ORANGE'
-    COLOR_CHOICES = (
-        (BL, 'Black'),
-        (WT, 'White'),
-        (OR, 'Orange'),
-    )
     color = models.CharField(
         choices=COLOR_CHOICES,
         verbose_name='Цвет шерсти',
-        max_length=20,
+        max_length=64,
     )
     name = models.CharField(
         verbose_name='Кличка кота',
-        max_length=30,
+        max_length=64,
     )
     birth_year = models.PositiveSmallIntegerField(
         verbose_name='Год рождения кота',
@@ -59,11 +65,15 @@ class Cat(models.Model):
         blank=True,
     )
     owner = models.ForeignKey(
-        'Owner',
+        'Person',
         related_name='cats',
-        null=True,
         on_delete=models.CASCADE,
         verbose_name='Хозяин кота',
+    )
+    achievements = models.ManyToManyField(
+        'Achievement',
+        verbose_name='Действия, совершенные котом',
+        related_name='cats',
     )
 
     def __str__(self):
@@ -75,4 +85,3 @@ class Cat(models.Model):
             current_year = date.today().year
             return current_year - self.birth_year
         return 'Год рождения не указан'
-        

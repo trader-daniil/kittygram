@@ -1,20 +1,40 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from cats.models import Cat
-from cats.serializers import CatSerializer
+from cats.models import Cat, Person
+from cats.serializers import CatSerializer, PersonSerializer, CatListSerializer
 from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework import generics
 from rest_framework import viewsets
+from rest_framework.decorators import action
+
+
+class PersonViewSet(viewsets.ModelViewSet):
+    """
+    Операции CRUD с моделью Person.
+    """
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
 
 
 class CatViewSet(viewsets.ModelViewSet):
     """
-    Все операции с моделью Cat.
+    Операции CRUD с моделью Cat.
     """
     queryset = Cat.objects.all()
     serializer_class = CatSerializer
+
+    @action(detail=False, url_path='white-cats')
+    def get_white_cats(self, request):
+        white_cats = Cat.objects.filter(color='White')
+        serializer = self.get_serializer(white_cats, many=True)
+        return Response(serializer.data)
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return CatListSerializer
+        return CatSerializer
 
 
 class ListCats2(generics.ListCreateAPIView):
