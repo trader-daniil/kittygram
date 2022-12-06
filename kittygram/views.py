@@ -1,13 +1,24 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from cats.models import Cat, Person
-from cats.serializers import CatSerializer, PersonSerializer, CatListSerializer
+from cats.models import Cat, Person, Achievement
+from cats.serializers import (
+    CatSerializer,
+    PersonSerializer,
+    CatListSerializer,
+    AchievementSerializer,
+)
 from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.decorators import action
+
+
+class AchievementViewSet(viewsets.ModelViewSet):
+    """Операции CRUD с моделью Achievement."""
+    queryset = Achievement.objects.all()
+    serializer_class = AchievementSerializer
 
 
 class PersonViewSet(viewsets.ModelViewSet):

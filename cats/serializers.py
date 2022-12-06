@@ -5,6 +5,7 @@ import datetime as dt
 
 class AchievementSerializer(serializers.ModelSerializer):
     """Сериализатор для достижений кота."""
+    id = serializers.IntegerField()
 
     class Meta:
         model = Achievement
@@ -31,6 +32,10 @@ class CatSerializer(serializers.ModelSerializer):
         #read_only=True,
         required=False,
     )
+    #achievements = serializers.PrimaryKeyRelatedField(
+    #    many=True,
+    #    queryset=Achievement.objects.all(),
+    #)
     age = serializers.SerializerMethodField()
     inscription = serializers.SerializerMethodField()
     color = serializers.ChoiceField(choices=COLOR_CHOICES)
@@ -56,7 +61,6 @@ class CatSerializer(serializers.ModelSerializer):
     def get_inscription(self, obj):
         return 'Simple inscription'
 
-
     def create(self, validated_data):
         if 'achievements' not in validated_data:
             cat = Cat.objects.create(**validated_data)
@@ -69,6 +73,31 @@ class CatSerializer(serializers.ModelSerializer):
             achievement.cats.add(cat)
         return cat
 
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.color = validated_data.get('color', instance.color)
+        instance.birth_year = validated_data.get('birth_year', instance.birth_year)
+        instance.owner = validated_data.get('owner', instance.owner)
+        instance.save()
+        if 'achievements' not in validated_data.keys():
+            return instance
+
+        achievements_data = validated_data.pop('achievements')
+        for achievement_data in achievements_data:
+            if 'id' in achievement_data.keys():
+                achievement = Achievement.objects.get(id=achievement_data['id'])
+                achievement.name = achievement_data.get('name', instance.name)
+                achievement.save()
+                continue
+
+            achievement = Achievement.objects.create(**achievement_data)
+            achievement.cats.add(instance)
+        return instance
+            
+            
+        
+            
 
 class PersonSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Person."""

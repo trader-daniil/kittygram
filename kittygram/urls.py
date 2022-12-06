@@ -12,6 +12,7 @@ from .views import (
     ListCats2,
     CatDetail2,
     CatViewSet,
+    AchievementViewSet,
 )
 
 router = DefaultRouter()
@@ -24,6 +25,11 @@ router.register(
     prefix='persons',
     viewset=PersonViewSet,
     basename='persons',
+)
+router.register(
+    prefix='achievements',
+    viewset=AchievementViewSet,
+    basename='achievements',
 )
 
 urlpatterns = [
