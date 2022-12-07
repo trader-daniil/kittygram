@@ -81,22 +81,33 @@ class CatSerializer(serializers.ModelSerializer):
         instance.owner = validated_data.get('owner', instance.owner)
         instance.save()
         if 'achievements' not in validated_data.keys():
+            instance.achievements.clear()
             return instance
 
+        modified_achievements_ids = []
         achievements_data = validated_data.pop('achievements')
         for achievement_data in achievements_data:
-            if 'id' in achievement_data.keys():
-                achievement = Achievement.objects.get(id=achievement_data['id'])
-                achievement.name = achievement_data.get('name', instance.name)
-                achievement.save()
+            if 'id' not in achievement_data.keys():
+                achievement = Achievement.objects.create(**achievement_data)
+                achievement.cats.add(instance)
+                modified_achievements_ids.append(achievement.id)
                 continue
 
-            achievement = Achievement.objects.create(**achievement_data)
+            achievement = Achievement.objects.get(id=achievement_data['id'])
+            achievement.name = achievement_data.get('name', instance.name)
+            if instance.id in achievement.cats.values_list('id', flat=True):
+                achievement.save()
+                modified_achievements_ids.append(achievement.id)
+                continue
             achievement.cats.add(instance)
+            achievement.save()
+            modified_achievements_ids.append(achievement.id)
+        for achievement in instance.achievements.all():
+            if achievement.id in modified_achievements_ids:
+                continue
+            achievement.cats.remove(instance)
+            achievement.save()
         return instance
-            
-            
-        
             
 
 class PersonSerializer(serializers.ModelSerializer):
