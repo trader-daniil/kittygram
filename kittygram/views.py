@@ -39,7 +39,7 @@ class CatViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, url_path='white-cats')
     def get_white_cats(self, request):
-        print(request.data)
+        print(request.user.username)
         white_cats = Cat.objects.filter(color='White')
         serializer = self.get_serializer(white_cats, many=True)
         return Response(serializer.data)
@@ -48,6 +48,9 @@ class CatViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return CatListSerializer
         return CatSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class ListCats2(generics.ListCreateAPIView):

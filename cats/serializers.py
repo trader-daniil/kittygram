@@ -55,6 +55,7 @@ class CatSerializer(serializers.ModelSerializer):
             'inscription',
             'color',
         )
+        read_only_fields = ('owner',)
 
     def get_age(self, obj):
         return dt.datetime.now().year - obj.birth_year
