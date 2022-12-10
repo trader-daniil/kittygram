@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Cat, Achievement, COLOR_CHOICES
-import datetime as dt
+from datetime import date
 from django.contrib.auth.models import User
 
 
@@ -62,6 +62,7 @@ class CatSerializer(serializers.ModelSerializer):
 
     def get_inscription(self, obj):
         return 'Simple inscription'
+    
 
     def create(self, validated_data):
         if 'achievements' not in validated_data:
@@ -110,6 +111,14 @@ class CatSerializer(serializers.ModelSerializer):
             achievement.cats.remove(instance)
             achievement.save()
         return instance
+
+    def validate_birth_year(self, value):
+        """Проверка возраста кота."""
+        current_year = date.today().year
+        if  40 < value > current_year:
+            raise serializers.ValidationError('Проверьте год рождения кота')
+        return value
+
             
 
 class PersonSerializer(serializers.ModelSerializer):
