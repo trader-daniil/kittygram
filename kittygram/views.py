@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from cats.models import Cat, Person, Achievement
+from cats.models import Cat, Achievement
 from cats.serializers import (
     CatSerializer,
     PersonSerializer,
@@ -13,6 +13,7 @@ from django.http import Http404
 from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from django.contrib.auth.models import User
 
 
 class AchievementViewSet(viewsets.ModelViewSet):
@@ -25,7 +26,7 @@ class PersonViewSet(viewsets.ModelViewSet):
     """
     Операции CRUD с моделью Person.
     """
-    queryset = Person.objects.all()
+    queryset = User.objects.all()
     serializer_class = PersonSerializer
 
 
@@ -38,6 +39,7 @@ class CatViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, url_path='white-cats')
     def get_white_cats(self, request):
+        print(request.data)
         white_cats = Cat.objects.filter(color='White')
         serializer = self.get_serializer(white_cats, many=True)
         return Response(serializer.data)

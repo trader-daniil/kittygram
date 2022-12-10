@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import (
     PersonViewSet,
@@ -42,4 +43,7 @@ urlpatterns = [
     #path('cats3/', ListCats2.as_view()),
     #path('cats3/<int:cat_id>', CatDetail2.as_view()),
     path('', include(router.urls)),
+    #path('api-token-auth/', obtain_auth_token),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
 ]

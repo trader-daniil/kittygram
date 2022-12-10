@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.contrib.auth.models import User
 
 
 class Achievement(models.Model):
@@ -10,36 +11,6 @@ class Achievement(models.Model):
         max_length=128,
         verbose_name='Название действия',
     )
-
-
-class Person(models.Model):
-    """
-    Модель человека.
-    """
-    ML = 'MALE'
-    FM = 'FEMALE'
-    NB = 'NON-BINARY'
-    SEX_CHOICES = (
-        (ML, 'Male'),
-        (FM, 'Female'),
-        (NB, 'Non-binary'),
-    )
-    first_name = models.CharField(
-        verbose_name='Имя человека',
-        max_length=256,
-    )
-    last_name = models.CharField(
-        verbose_name='Фамилия человека',
-        max_length=256,
-    )
-    sex = models.CharField(
-        choices=SEX_CHOICES,
-        verbose_name='Пол человека',
-        max_length=128,
-    )
-
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
 
 
 COLOR_CHOICES = (
@@ -65,7 +36,7 @@ class Cat(models.Model):
         blank=True,
     )
     owner = models.ForeignKey(
-        'Person',
+        User,
         related_name='cats',
         on_delete=models.CASCADE,
         verbose_name='Хозяин кота',

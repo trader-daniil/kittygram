@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Cat, Person, Achievement, COLOR_CHOICES
+from .models import Cat, Achievement, COLOR_CHOICES
 import datetime as dt
+from django.contrib.auth.models import User
 
 
 class AchievementSerializer(serializers.ModelSerializer):
@@ -111,7 +112,7 @@ class CatSerializer(serializers.ModelSerializer):
             
 
 class PersonSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Person."""
+    """Сериализатор для модели User."""
     cats = serializers.SlugRelatedField(
         slug_field='name',
         queryset=Cat.objects.all(),
@@ -119,7 +120,7 @@ class PersonSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Person
+        model = User
         fields = (
             'id',
             'first_name',
