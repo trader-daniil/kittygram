@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Cat, Achievement, COLOR_CHOICES
 from datetime import date
 from django.contrib.auth.models import User
-
+from rest_framework.validators import UniqueTogetherValidator
 
 class AchievementSerializer(serializers.ModelSerializer):
     """Сериализатор для достижений кота."""
@@ -57,8 +57,16 @@ class CatSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('owner',)
 
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Cat.objects.all(),
+                fields=('name', 'owner'),
+                message='Вы уже добавили этого кота',
+            )
+        ]
+
     def get_age(self, obj):
-        return dt.datetime.now().year - obj.birth_year
+        return date.today().year - obj.birth_year
 
     def get_inscription(self, obj):
         return 'Simple inscription'
@@ -118,6 +126,16 @@ class CatSerializer(serializers.ModelSerializer):
         if  40 < value > current_year:
             raise serializers.ValidationError('Проверьте год рождения кота')
         return value
+
+
+    def validate(self, data):
+        if data['name'] == data['color']:
+            raise serializers.ValidationError(
+                'Имя не может совпадать с цветом',
+            )
+        return data
+
+    
 
             
 
