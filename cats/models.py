@@ -47,6 +47,13 @@ class Cat(models.Model):
         related_name='cats',
     )
 
+    constraints = (
+        models.UniqueConstraint(
+            fields=('owner', 'name'),
+            name='unique_owners_cat',
+        ),
+    )
+
     def __str__(self):
         return self.name
 

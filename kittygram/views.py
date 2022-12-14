@@ -6,7 +6,7 @@ from cats.serializers import (
     CatSerializer,
     PersonSerializer,
     CatListSerializer,
-    AchievementSerializer,
+    CreateAchievementSerializer,
 )
 from rest_framework.views import APIView
 from django.http import Http404
@@ -14,12 +14,14 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
 
 
 class AchievementViewSet(viewsets.ModelViewSet):
     """Операции CRUD с моделью Achievement."""
     queryset = Achievement.objects.all()
-    serializer_class = AchievementSerializer
+    serializer_class = CreateAchievementSerializer
+    permission_classes = (AllowAny,)
 
 
 class PersonViewSet(viewsets.ModelViewSet):
