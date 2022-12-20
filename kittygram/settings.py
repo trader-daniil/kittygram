@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'cats',
     'djoser',
+    'cars',
+    'django_elasticsearch_dsl',
     #'rest_framework.authtoken',
 ]
 
@@ -52,6 +54,13 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 } 
+
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'localhost'
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
