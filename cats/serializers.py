@@ -1,8 +1,19 @@
 from rest_framework import serializers
 from .models import Cat, Achievement, COLOR_CHOICES
-import datetime as dt
+from datetime import date
 from django.contrib.auth.models import User
+from rest_framework.validators import UniqueTogetherValidator
 
+
+class CreateAchievementSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания достижений кота."""
+
+    class Meta:
+        model = Achievement
+        fields = (
+            'id',
+            'name',
+        )
 
 class AchievementSerializer(serializers.ModelSerializer):
     """Сериализатор для достижений кота."""
@@ -40,6 +51,10 @@ class CatSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
     inscription = serializers.SerializerMethodField()
     color = serializers.ChoiceField(choices=COLOR_CHOICES)
+    owner = serializers.StringRelatedField(
+        read_only=True,
+        default=serializers.CurrentUserDefault(),
+    )
 
 
     class Meta:
@@ -55,13 +70,21 @@ class CatSerializer(serializers.ModelSerializer):
             'inscription',
             'color',
         )
+        read_only_fields = ('owner',)
+        validators = (
+            UniqueTogetherValidator(
+                queryset=Cat.objects.all(),
+                fields=('owner', 'name'),
+            ),
+        )
+
 
     def get_age(self, obj):
-        return dt.datetime.now().year - obj.birth_year
+        return date.today().year - obj.birth_year
 
     def get_inscription(self, obj):
         return 'Simple inscription'
-
+    
     def create(self, validated_data):
         if 'achievements' not in validated_data:
             cat = Cat.objects.create(**validated_data)
@@ -109,6 +132,14 @@ class CatSerializer(serializers.ModelSerializer):
             achievement.cats.remove(instance)
             achievement.save()
         return instance
+
+    def validate_birth_year(self, value):
+        """Проверка возраста кота."""
+        current_year = date.today().year
+        if  40 < value > current_year:
+            raise serializers.ValidationError('Проверьте год рождения кота')
+        return value
+
             
 
 class PersonSerializer(serializers.ModelSerializer):

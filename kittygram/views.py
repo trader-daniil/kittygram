@@ -6,7 +6,7 @@ from cats.serializers import (
     CatSerializer,
     PersonSerializer,
     CatListSerializer,
-    AchievementSerializer,
+    CreateAchievementSerializer,
 )
 from rest_framework.views import APIView
 from django.http import Http404
@@ -14,12 +14,14 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
 
 
 class AchievementViewSet(viewsets.ModelViewSet):
     """Операции CRUD с моделью Achievement."""
     queryset = Achievement.objects.all()
-    serializer_class = AchievementSerializer
+    serializer_class = CreateAchievementSerializer
+    permission_classes = (AllowAny,)
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -39,7 +41,7 @@ class CatViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, url_path='white-cats')
     def get_white_cats(self, request):
-        print(request.data)
+        print(request.user.username)
         white_cats = Cat.objects.filter(color='White')
         serializer = self.get_serializer(white_cats, many=True)
         return Response(serializer.data)
@@ -48,6 +50,9 @@ class CatViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return CatListSerializer
         return CatSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class ListCats2(generics.ListCreateAPIView):
